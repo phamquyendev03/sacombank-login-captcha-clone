@@ -1,28 +1,46 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchCaptcha, loginStep1 } from '../api/auth';
+import { initAuth } from '../api/auth';
 
+/**
+ * LoginStep1 — Step 1 của luồng đăng nhập Sacombank Proxy
+ *
+ * Chức năng:
+ * - Khi mount: gọi /auth/init → lấy captchaImage, encryptKey, jsessionId, submitActionUrl
+ * - Hiển thị captcha thật từ Sacombank
+ * - Người dùng nhập username + captchaCode → nhấn TIẾP TỤC
+ * - Gọi onSuccess({ username, encryptKey, jsessionId, submitActionUrl })
+ *   để truyền dữ liệu sang Step 2
+ */
 export default function LoginStep1({ onSuccess }) {
   const [username, setUsername] = useState('');
   const [captchaCode, setCaptchaCode] = useState('');
   const [captchaImage, setCaptchaImage] = useState('');
-  const [publicKey, setPublicKey] = useState('');
-  const [useMSign, setUseMSign] = useState(false);
+  const [sessionData, setSessionData] = useState(null); // { encryptKey, jsessionId, submitActionUrl }
   const [loading, setLoading] = useState(false);
   const [loadingCaptcha, setLoadingCaptcha] = useState(false);
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
   const [spinning, setSpinning] = useState(false);
 
-  const loadCaptcha = useCallback(async () => {
+  // ── Load phiên mới từ Proxy Server ────────────────────────────────────────
+  const loadSession = useCallback(async () => {
     setLoadingCaptcha(true);
     setSpinning(true);
+    setApiError('');
     try {
-      const data = await fetchCaptcha();
-      setCaptchaImage(data.base64Image);
-      setPublicKey(data.publicKey);
-      setApiError('');
+      // Gọi /auth/init → Proxy gọi Sacombank → trả về captcha + session info
+      const data = await initAuth();
+      setCaptchaImage(data.captchaImage || '');
+      setSessionData({
+        encryptKey: data.encryptKey,
+        jsessionId: data.jsessionId,
+        submitActionUrl: data.submitActionUrl,
+      });
     } catch (e) {
-      setApiError('Không thể kết nối tới máy chủ. Vui lòng đảm bảo backend đang chạy tại http://localhost:8080');
+      setApiError(
+        'Không thể kết nối đến Sacombank. Vui lòng kiểm tra backend đang chạy tại ' +
+        'http://localhost:8080 và có kết nối Internet.'
+      );
     } finally {
       setLoadingCaptcha(false);
       setTimeout(() => setSpinning(false), 600);
@@ -30,9 +48,10 @@ export default function LoginStep1({ onSuccess }) {
   }, []);
 
   useEffect(() => {
-    loadCaptcha();
-  }, [loadCaptcha]);
+    loadSession();
+  }, [loadSession]);
 
+  // ── Validation ─────────────────────────────────────────────────────────────
   const validate = () => {
     const errs = {};
     if (!username.trim()) errs.username = 'Vui lòng nhập tên đăng nhập';
@@ -40,25 +59,37 @@ export default function LoginStep1({ onSuccess }) {
     return errs;
   };
 
+  // ── Submit Step 1 ──────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
+
+    if (!sessionData?.jsessionId) {
+      setApiError('Phiên đăng nhập chưa sẵn sàng. Vui lòng đợi hoặc làm mới captcha!');
+      return;
+    }
+
     setLoading(true);
     try {
-      await loginStep1(username.trim(), captchaCode.trim());
-      onSuccess({ username: username.trim(), publicKey });
+      // Truyền sang Step 2: username + toàn bộ thông tin phiên Sacombank
+      onSuccess({
+        username: username.trim(),
+        captchaAnswer: captchaCode.trim(),
+        encryptKey: sessionData.encryptKey,
+        jsessionId: sessionData.jsessionId,
+        submitActionUrl: sessionData.submitActionUrl,
+      });
     } catch (err) {
       setApiError(err.message);
-      loadCaptcha();
-      setCaptchaCode('');
     } finally {
       setLoading(false);
     }
   };
 
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="login-wrapper">
       <div className="login-card">
@@ -67,6 +98,7 @@ export default function LoginStep1({ onSuccess }) {
           <div className="login-logo">
             <span className="login-logo-text">e<span>SACOMBANK</span></span>
           </div>
+          <p className="login-subtitle">Đăng nhập trực tuyến an toàn</p>
         </div>
 
         {/* Form */}
@@ -89,6 +121,7 @@ export default function LoginStep1({ onSuccess }) {
             {errors.username && <p className="error-msg">⚠ {errors.username}</p>}
           </div>
 
+          {/* Captcha */}
           <div className="form-group">
             <label className="form-label">
               MÃ XÁC NHẬN <span className="required">*</span>
@@ -98,7 +131,7 @@ export default function LoginStep1({ onSuccess }) {
                 id="captchaCode"
                 className={`form-input${errors.captchaCode ? ' input-error' : ''}`}
                 type="text"
-                placeholder="Nhập mã xác nhận"
+                placeholder="Nhập mã >"
                 value={captchaCode}
                 onChange={e => { setCaptchaCode(e.target.value); setErrors(p => ({ ...p, captchaCode: '' })); }}
                 autoComplete="off"
@@ -107,7 +140,7 @@ export default function LoginStep1({ onSuccess }) {
               <div className="captcha-image-box">
                 {loadingCaptcha ? (
                   <div style={{
-                    height: 44, width: 110, display: 'flex',
+                    height: 44, width: 120, display: 'flex',
                     alignItems: 'center', justifyContent: 'center',
                     border: '1.5px solid #d1d5db', borderRadius: 6,
                     background: '#f9fafb'
@@ -123,8 +156,9 @@ export default function LoginStep1({ onSuccess }) {
                 ) : captchaImage ? (
                   <img
                     src={captchaImage}
-                    alt="Mã xác nhận"
-                    style={{ cursor: 'default' }}
+                    alt="Mã xác nhận từ Sacombank"
+                    title="Ảnh captcha thật từ hệ thống Sacombank"
+                    style={{ cursor: 'default', maxHeight: 44 }}
                   />
                 ) : (
                   <div style={{
@@ -138,8 +172,8 @@ export default function LoginStep1({ onSuccess }) {
                 <button
                   type="button"
                   className={`captcha-refresh-btn${spinning ? ' spinning' : ''}`}
-                  onClick={loadCaptcha}
-                  title="Làm mới mã xác nhận"
+                  onClick={loadSession}
+                  title="Làm mới captcha (lấy phiên mới từ Sacombank)"
                   disabled={loadingCaptcha}
                 >
                   ↻
@@ -165,9 +199,9 @@ export default function LoginStep1({ onSuccess }) {
             id="btn-login-step1"
             type="submit"
             className="btn-primary"
-            disabled={loading}
+            disabled={loading || loadingCaptcha}
           >
-            {loading ? <><div className="btn-spinner" /> Đang xử lý...</> : 'ĐĂNG NHẬP'}
+            {loading ? <><div className="btn-spinner" /> Đang xử lý...</> : 'TIẾP TỤC'}
           </button>
         </form>
 

@@ -1,0 +1,62 @@
+﻿
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.5)
+
+2026-03-31T13:56:59.196+07:00  INFO 5540 --- [sacombanklogindemo] [           main] c.q.s.SacombanklogindemoApplication      : Starting SacombanklogindemoApplication v0.0.1-SNAPSHOT using Java 23.0.2 with PID 5540 (D:\sacombanklogindemo\backend\build\libs\sacombanklogindemo-0.0.1-SNAPSHOT.jar started by paqvi in D:\sacombanklogindemo\backend)
+2026-03-31T13:56:59.206+07:00  INFO 5540 --- [sacombanklogindemo] [           main] c.q.s.SacombanklogindemoApplication      : No active profile set, falling back to 1 default profile: "default"
+2026-03-31T13:57:00.225+07:00  INFO 5540 --- [sacombanklogindemo] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-31T13:57:00.370+07:00  INFO 5540 --- [sacombanklogindemo] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 135 ms. Found 1 JPA repository interface.
+2026-03-31T13:57:01.118+07:00  INFO 5540 --- [sacombanklogindemo] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-03-31T13:57:01.146+07:00  INFO 5540 --- [sacombanklogindemo] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-31T13:57:01.146+07:00  INFO 5540 --- [sacombanklogindemo] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-03-31T13:57:01.178+07:00  INFO 5540 --- [sacombanklogindemo] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1881 ms
+2026-03-31T13:57:01.507+07:00  INFO 5540 --- [sacombanklogindemo] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-03-31T13:57:01.602+07:00  INFO 5540 --- [sacombanklogindemo] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-03-31T13:57:02.144+07:00  INFO 5540 --- [sacombanklogindemo] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-31T13:57:02.180+07:00  INFO 5540 --- [sacombanklogindemo] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-31T13:57:02.339+07:00  INFO 5540 --- [sacombanklogindemo] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3f40568e
+2026-03-31T13:57:02.340+07:00  INFO 5540 --- [sacombanklogindemo] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-31T13:57:02.383+07:00  WARN 5540 --- [sacombanklogindemo] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-03-31T13:57:02.404+07:00  INFO 5540 --- [sacombanklogindemo] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/sacombankdb?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.42
+	Default catalog/schema: sacombankdb/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-31T13:57:03.179+07:00  INFO 5540 --- [sacombanklogindemo] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-31T13:57:03.239+07:00  INFO 5540 --- [sacombanklogindemo] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-31T13:57:03.281+07:00  WARN 5540 --- [sacombanklogindemo] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'authController' defined in URL [jar:nested:/D:/sacombanklogindemo/backend/build/libs/sacombanklogindemo-0.0.1-SNAPSHOT.jar/!BOOT-INF/classes/!/com/quyen/sacombanklogindemo/controller/AuthController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'sacombankProxyService' defined in URL [jar:nested:/D:/sacombanklogindemo/backend/build/libs/sacombanklogindemo-0.0.1-SNAPSHOT.jar/!BOOT-INF/classes/!/com/quyen/sacombanklogindemo/service/SacombankProxyService.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'org.springframework.web.reactive.function.client.WebClient$Builder' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2026-03-31T13:57:03.282+07:00  INFO 5540 --- [sacombanklogindemo] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-31T13:57:03.284+07:00  INFO 5540 --- [sacombanklogindemo] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-03-31T13:57:03.300+07:00  INFO 5540 --- [sacombanklogindemo] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-03-31T13:57:03.303+07:00  INFO 5540 --- [sacombanklogindemo] [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-03-31T13:57:03.313+07:00  INFO 5540 --- [sacombanklogindemo] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-03-31T13:57:03.329+07:00 ERROR 5540 --- [sacombanklogindemo] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in com.quyen.sacombanklogindemo.service.SacombankProxyService required a bean of type 'org.springframework.web.reactive.function.client.WebClient$Builder' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.web.reactive.function.client.WebClient$Builder' in your configuration.
+

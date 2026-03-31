@@ -152,7 +152,7 @@ body {
 /* Captcha Row */
 .captcha-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: stretch;
 }
 
@@ -169,8 +169,11 @@ body {
 
 .captcha-image-box img {
   height: 44px;
-  width: 110px;
-  object-fit: cover;
+  width: auto;
+  min-width: 100px;
+  max-width: 160px;
+  object-fit: contain;
+  background: #fff;
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   display: block;

@@ -30,11 +30,27 @@ function LoginSuccess({ username, message, onReset }) {
 
 export default function App() {
   const [step, setStep] = useState(1);
-  const [userData, setUserData] = useState({ username: '', publicKey: '' });
+
+  /**
+   * userData chứa toàn bộ thông tin phiên Sacombank từ Step 1:
+   * - username        : tên đăng nhập
+   * - captchaAnswer   : mã captcha đã nhập
+   * - encryptKey      : __JS_ENCRYPT_KEY__ từ Sacombank
+   * - jsessionId      : JSESSIONID của phiên Sacombank
+   * - submitActionUrl : URL POST form Sacombank
+   */
+  const [userData, setUserData] = useState({
+    username:        '',
+    captchaAnswer:   '',
+    encryptKey:      '',
+    jsessionId:      '',
+    submitActionUrl: '',
+  });
   const [successMsg, setSuccessMsg] = useState('');
 
-  const handleStep1Success = ({ username, publicKey }) => {
-    setUserData({ username, publicKey });
+  // Khi Step 1 hoàn tất: lưu session data và chuyển sang Step 2
+  const handleStep1Success = ({ username, captchaAnswer, encryptKey, jsessionId, submitActionUrl }) => {
+    setUserData({ username, captchaAnswer, encryptKey, jsessionId, submitActionUrl });
     setStep(2);
   };
 
@@ -45,7 +61,7 @@ export default function App() {
 
   const handleReset = () => {
     setStep(1);
-    setUserData({ username: '', publicKey: '' });
+    setUserData({ username: '', captchaAnswer: '', encryptKey: '', jsessionId: '', submitActionUrl: '' });
     setSuccessMsg('');
   };
 
@@ -63,7 +79,10 @@ export default function App() {
     return (
       <LoginStep2
         username={userData.username}
-        publicKey={userData.publicKey}
+        captchaAnswer={userData.captchaAnswer}
+        encryptKey={userData.encryptKey}
+        jsessionId={userData.jsessionId}
+        submitActionUrl={userData.submitActionUrl}
         onBack={() => setStep(1)}
         onSuccess={handleStep2Success}
       />

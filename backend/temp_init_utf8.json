@@ -1,0 +1,30 @@
+﻿{
+    "hiddenFields": {
+        "CATEGORY_ID": "",
+        "QS": "",
+        "Requestid": "1",
+        "AuthenticationFG.TRANSACTION_ID": "887",
+        "languageId": "003",
+        "FG_BUTTONS__": "VALIDATE_CREDENTIALS,VALIDATE_EV_AUTH_CREDENTIALS,STU_VALIDATE_CREDENTIALS,VALIDATE_CREDENTIALS_DIG_CERT,BACK,CLEAR_VALUES",
+        "CHECKBOX_NAMES__": "AuthenticationFG.IS_MSIGN_LOGIN",
+        "AuthenticationFG.DEVICE_C_FINGERPRINT": "",
+        "AuthenticationFG.IS_FIRST_AUTHENTICATION": "Y",
+        "USER_ID_COOKIE": "",
+        "RIA_TARGETS": "STATUS_MOBILELOGIN,,,",
+        "display_error_var": "Y",
+        "bankId": "303",
+        "CAN_USER_SELF_ENABLE": "",
+        "UIType": "UX5",
+        "AuthenticationFG.PREFERRED_LANGUAGE": "001",
+        "AuthenticationFG.REPORTTITLE": "AuthenticationScreenUX5",
+        "DECRYPT_FLAG": "N",
+        "userType": "1",
+        "JS_ENABLED_FLAG": "N",
+        "FORMSGROUP_ID__": "AuthenticationFG",
+        "isHorizontalLayout": "true"
+    },
+    "submitActionUrl": "https://www.isacombank.com.vnAuthenticationController;jsessionid=0000KBr63eYoK8Y0sWVuugjjZm0:1c9a3l9ob?bwayparam=7BmTpSJ2Fd1Vch5OoDF7pw%3D%3D",
+    "jsessionId": null,
+    "captchaImage": null,
+    "encryptKey": null
+}

